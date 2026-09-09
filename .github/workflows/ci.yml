@@ -1,0 +1,36 @@
+# TODO(DevOps - user): finish this pipeline as a learning exercise.
+#
+# This workflow currently only checks out the repo - it doesn't lint,
+# typecheck, test, or build anything yet. Wire up the jobs below, in this
+# order, each depending on the previous succeeding:
+#
+#   1. install   - `npm ci` at the repo root (npm workspaces installs all
+#                   three packages in one pass - no per-package install step).
+#   2. lint       - ESLint + Prettier (Section 8 requires these configured
+#                   from the first commit; add the config, then run it here).
+#   3. typecheck  - `npm run typecheck` in apps/backend, apps/mobile, and
+#                   packages/shared-types (each already has this script).
+#   4. test       - `npm test` in apps/backend and apps/mobile.
+#   5. build      - `npm run build` in apps/backend (produces dist/); the
+#                   mobile app doesn't have a CI "build" step until EAS
+#                   Build is set up (out of scope for now).
+#
+# Trigger this on pull_request and on push to main, per Section 9's
+# "merge into main only after tests pass" rule.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  # TODO(DevOps - user): replace this placeholder job with the real
+  # install/lint/typecheck/test/build jobs described above.
+  checkout-only:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder - replace with real CI steps
+        run: echo "TODO(DevOps - user): add install/lint/typecheck/test/build jobs"

@@ -1,0 +1,40 @@
+# TODO(DevOps - user): finish this local dev stack as a learning exercise.
+#
+# This should bring up everything the backend needs locally: Postgres
+# (source of truth, Section 4), Redis (cache + BullMQ job queue), and the
+# backend API itself. Currently only Postgres and Redis are wired up - the
+# backend service is commented out until its Dockerfile is finished and it
+# actually has something to connect to (no ORM/migrations exist yet).
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: hyllvy
+      POSTGRES_PASSWORD: hyllvy_dev_only
+      POSTGRES_DB: hyllvy
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+
+  # TODO(DevOps - user): uncomment once apps/backend/Dockerfile is finished
+  # and DATABASE_URL/REDIS_URL (see .env.example) are actually consumed.
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/backend/Dockerfile
+  #   env_file: .env
+  #   ports:
+  #     - '3000:3000'
+  #   depends_on:
+  #     - postgres
+  #     - redis
+
+volumes:
+  postgres_data:
