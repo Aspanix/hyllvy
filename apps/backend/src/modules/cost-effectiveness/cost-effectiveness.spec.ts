@@ -10,6 +10,9 @@ function nutrition(overrides: Partial<NutritionFact> = {}): NutritionFact {
     calories: 120,
     perQuantity: 100,
     unit: 'g',
+    source: 'open_food_facts',
+    trustStatus: 'verified',
+    submittedByUserId: null,
     ...overrides,
   };
 }
