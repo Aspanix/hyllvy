@@ -1,0 +1,10 @@
+{
+  "name": "hyllvy",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Hyllvy - grocery macro & price scanner (Sweden/Scandinavia MVP)",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

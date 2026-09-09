@@ -1,0 +1,6 @@
+{
+  "name": "@hyllvy/backend",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Hyllvy API/BFF - module skeletons scaffolded in a later deliverable"
+}
