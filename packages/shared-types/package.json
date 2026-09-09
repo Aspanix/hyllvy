@@ -4,5 +4,11 @@
   "version": "0.0.1",
   "description": "Shared TypeScript models (Product/Price/Macro) for Hyllvy client and backend",
   "main": "src/index.ts",
-  "types": "src/index.ts"
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.2"
+  }
 }
