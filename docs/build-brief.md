@@ -137,7 +137,9 @@ Flag clearly in code comments and README where each of these is addressed. Claud
 - `ShoppingSession` — id, user_id, store_id, started_at, ended_at
 - `SessionItem` — session_id, product_id, quantity, added_at (feeds the running tally)
 - `Product` — id, barcode (unique), name, brand, off_id (Open Food Facts reference)
-- `NutritionFact` — product_id, protein_g, carbs_g, fat_g, calories, per_quantity, unit
+- `NutritionFact` — product_id, protein_g, carbs_g, fat_g, calories, per_quantity, unit,
+  source (enum: open_food_facts/user_submitted), trust_status (enum: verified/community/
+  missing — drives the data-trust badge in Section 12), submitted_by_user_id (nullable)
 - `Store` — id, chain (enum: willys/ica/lidl/other), name, address, lat, lng, region
 - `ProductObservation` — store_id, product_id, price, currency, observed_by_user_id,
   observed_at, confidence (nullable, for future use)
@@ -216,7 +218,75 @@ sublicense, or sell copies of the software, in whole or in part, without prior w
 permission from the copyright holder. Reference this plainly in the README as well, so
 it's not just buried in a license file.
 
-## 11. First deliverables for Claude Code
+## 12. UI/UX direction
+
+Consistency across screens matters as much as any individual screen's design — build a
+small design system first, then reuse it everywhere, rather than designing each screen
+independently. Every screen (auth, macro setup, dashboard, scan, product detail,
+settings) should read as the same app.
+
+### Design tokens
+- **Accent color**: teal (`#0F6E56` / `#E1F5EE` light tint) — reserved specifically for
+  cost-effectiveness callouts (e.g. "kr per gram of protein" badges) and primary actions.
+  Don't introduce other accent colors for ordinary UI.
+- **Warning/stale color**: amber (`#EF9F27` / `#FAEEDA` light tint) — used for stale
+  price data and unverified/community-submitted nutrition data.
+- **Typography scale**: screen titles 20px medium, card/list labels 15px medium,
+  supporting/secondary text 13px regular. No other sizes without a specific reason.
+- **Cards**: consistent radius (12px), consistent padding, consistent border treatment
+  (hairline border, no heavy shadows) across every card anywhere in the app.
+
+### Reusable components (build once, use everywhere)
+- **Metric card** — used on the dashboard for daily macro progress (protein, carbs, fat,
+  calories) and reusable anywhere a single number + label needs displaying.
+- **Product card** — name, macro line (e.g. "12g protein / 100g"), price, and a data-trust
+  badge. Used in the live scan overlay, shopping session summaries, and product detail.
+- **Data-trust badge** — a small pill shown on any product data with three states:
+  "Verified label" (confirmed source, e.g. an authoritative Open Food Facts entry),
+  "Community-submitted" (crowdsourced/unverified), "Not found" (prompts the user to
+  submit data by photographing the label). Applies to BOTH nutrition data and price data
+  — these are conceptually the same "how much should I trust this number" pattern and
+  should share one component, not two different ones.
+- **Primary button / ghost button** — one consistent button style throughout; only one
+  primary (filled, teal) action per screen, everything else secondary/ghost.
+- **Section list row** — standard row with label + trailing chevron, used in settings and
+  anywhere else a navigable list appears.
+
+### Data trustworthiness — important product/legal detail
+Nutrition data from Open Food Facts is real, human-submitted label data, not an AI
+guess — but it is crowdsourced and can be outdated, mismatched to the wrong product
+variant, or simply missing for regional Swedish products. This must be surfaced in the
+UI via the data-trust badge above, not just disclosed in a terms-of-service page. When a
+barcode has no matching entry, let the user photograph the physical label and submit it
+— this both fills the gap for that user and grows the dataset for future scans at the
+same product. Reinforce the Section 5 disclaimer (informational only, verify allergens
+against the physical package) directly on product detail screens, not only in a legal
+document nobody reads.
+
+### Screens to build
+Using the shared design system above:
+- **Onboarding / auth**: sign up, log in. Standard patterns — email/password or
+  passwordless, no need for a custom mockup, just follow the token system.
+- **Macro goal setup**: user sets daily protein/carbs/fat/calorie targets (Section 2).
+- **Dashboard/home**: today's macro progress (metric cards), recent shopping session
+  activity (product cards with trust badges), primary CTA to start scanning.
+- **Live scan screen**: camera feed with live overlay product cards for each resolved
+  barcode (per the small-barcode UX discussion — cards appear once a barcode is
+  decodable; a "move closer" indicator shows for detected-but-unresolved barcodes),
+  persistent daily macro progress bar pinned at the top.
+- **Product detail**: full nutrition breakdown, price + cost-effectiveness, data-trust
+  badges, "report incorrect data" / "submit label photo" action.
+- **Shopping session summary**: list of scanned products (product cards) with running
+  macro totals for the session.
+- **Settings**: macro goals (edit), account, data/privacy controls (view/export/delete
+  data, per the GDPR requirements in Section 5), about/legal links.
+
+Reference mockups for the live scan screen and dashboard were produced during planning
+and should be treated as the intended direction for those two screens specifically; all
+other screens should be designed using the token system and component list above rather
+than left to ad hoc per-screen decisions.
+
+## 13. First deliverables for Claude Code
 
 1. Create the GitHub repository as `hyllvy` and scaffold the monorepo structure
    (`/apps/mobile`, `/apps/backend`, `/packages/shared-types`), using the `hyllvy` /
@@ -224,7 +294,10 @@ it's not just buried in a license file.
 2. Set up backend module skeletons per Section 4 with interfaces defined (even if
    implementations are stubs initially).
 3. Set up the Expo app skeleton with camera/barcode detection wired to a placeholder
-   overlay UI.
+   overlay UI, implementing the design token system and reusable components from
+   Section 12 first, then building the live scan and dashboard screens to match the
+   reference mockups before building the remaining standard screens (auth, macro setup,
+   product detail, session summary, settings) on top of the same component set.
 4. Add `LEGAL.md`, `LICENSE.md`, `README.md` (with the Hyllvy name/tagline, and
    disclaimers from Section 5 and 10).
 5. Add DevOps scaffolding per Section 7 with `TODO(DevOps — user)` markers.
